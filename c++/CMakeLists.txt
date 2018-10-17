@@ -29,6 +29,12 @@ if (OpenCV_FOUND)
   include_directories(SYSTEM ${OPENCV_INCLUDE_DIRS})
 endif()
 
+# Boost
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+find_package(Boost 1.45.0 COMPONENTS program_options REQUIRED)
+
 # Local libraries
 include_directories( "${PROJECT_SOURCE_DIR}/src" )
 add_subdirectory(src)
@@ -42,4 +48,9 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 if (OpenCV_FOUND)
   target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
   target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+endif()
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 endif()

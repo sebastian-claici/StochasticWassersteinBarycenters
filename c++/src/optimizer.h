@@ -276,7 +276,7 @@ class Optimizer {
   }
 
   bool GLOBAL_OPT = true;
-  int LOCAL_ITERS = 1;
+  int LOCAL_ITERS = 3;
 
  private:
 

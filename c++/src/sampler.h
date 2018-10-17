@@ -194,8 +194,10 @@ class UniformLine : public Sampler<V> {
 template<typename V>
 class UniformEllipse : public Sampler<V> {
  public:
-  UniformEllipse(const V &p, const V &q, double e)
+ UniformEllipse(const V &p, const V &q, double e):
   q_(q), p_(p), e_(e) {
+    c_ = (p_ + q_) / 2;
+    precompute();
   }
 
   V operator()() {
@@ -205,6 +207,7 @@ class UniformEllipse : public Sampler<V> {
   V sample() {
     double t = dist_(generator_);
     int i = choose_(generator_);
+    int j = (i + 1) % static_cast<int>(points_.size());
 
     auto P = points_[i];
     auto Q = points_[j];
@@ -228,12 +231,12 @@ class UniformEllipse : public Sampler<V> {
 
     double axis_norm = (p_ - q_).squaredNorm();
     double a = 0.5 * std::sqrt(axis_norm);
-    double b = a * std::sqrt(1 - e * e);
+    double b = a * std::sqrt(1 - e_ * e_);
 
     for (int i = 0; i <= N; ++i) {
       double alpha = t + h * i;
-      double x = a_ * std::cos(alpha);
-      double y = b_ * std::sin(alpha);
+      double x = a * std::cos(alpha);
+      double y = b * std::sin(alpha);
       double w = std::atan2(q_(2) - p_(2), q_(1) - p_(1));
 
       x = (p_(1) + q_(1)) / 2 + x * std::cos(w) - y * std::sin(w);
@@ -253,7 +256,8 @@ class UniformEllipse : public Sampler<V> {
   }
 
   V c_;
-  double a_, b_, r_;
+  V p_, q_;
+  double e_;
 
   std::discrete_distribution<int> choose_;
   std::vector<VectorXd> points_;
